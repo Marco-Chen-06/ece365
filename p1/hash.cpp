@@ -15,9 +15,65 @@ hashTable::hashTable(int size) {
 }
 
 // public functions
-int hashTable::insert(const std::string &key, void *pv = nullptr) {
-    
+int hashTable::insert(const std::string &key, void *pv) {
+    hashItem item;
+    item.key = key;
+    item.isOccupied = true;
+    item.isDeleted = false;
+    item.pv = nullptr;
+    int hash_index = hash(key);
+
+    while ((data[hash_index].isOccupied) || data[hash_index].isDeleted) {
+        if (filled >= capacity)  {
+            rehash();
+        }
+        hash_index = (hashindex + 1) % capacity;
+    }
+
+    data[hash_index] = item;
+    filled++;
+    return 0;
 }
+
+bool hashTable::contains(const std::string &key) {
+    if (findPos(key) == -1) {
+        return false;
+    }
+    return true;
+}
+
+void *hashTable::getPointer(const std::string &key, bool *b) {
+    int index = findPos(key);
+    if (index == -1) {
+        if (b) {
+            *b = false;
+        }
+        return nullptr;
+    }
+
+    if (b) {
+        *b = true;
+    }
+    return &data[index];
+}
+
+int hashTable::setPointer(const std::string &key, void *pv) {
+    int index = findPos(key);
+    if (index == -1) {
+        return 1;
+    }
+    pv = &data[index];
+    return 0;
+}
+bool hashTable::remove(const std::string &key) {
+    int index = findPos(key);
+    if (index == -1) {
+        return false;
+    }
+    data[index].isDeleted = true;
+    return true;
+}
+
 
 int hashTable::getCapacity() {
     return capacity;
@@ -37,6 +93,39 @@ int hashTable::hash(const std::string &key) {
     }
     return hash % capacity;
 
+}
+
+int hashTable::findPos(const std::string &key) {
+    for (int i = 0; i < data.size(); i++) {
+        if (data[i].key == key) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+bool hashTable::rehash() {
+    std::vector<hashItem> new_data;
+    capacity = getPrime(capacity * 2);
+    try {
+        new_data.resize(capacity); // Request a huge size
+    } catch (const std::bad_alloc& e) {
+        return false;
+    }
+    new_data.resize(capacity);
+
+    int hash_index;
+    for (int i = 0; i < data.size(); i++) {
+        if (data[i].isOccupied) {
+            hash_index = hash(data[i].key);
+            while (new_data[i].isOccupied) {
+                hash_index++;
+            }
+            new_data[hash_index] = data[i];
+        }
+    }
+    data = std::move(new_data);
+    return true;
 }
 
 // Return a prime number at least as large as size.
