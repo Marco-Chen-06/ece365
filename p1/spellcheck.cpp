@@ -3,5 +3,7 @@
 
 int main() {
     std::cout << "Hi" << std::endl;
-    return 0;
+    hashTable ht(100);
+    int capacity = ht.getCapacity();
+    std::cout << capacity;
 }

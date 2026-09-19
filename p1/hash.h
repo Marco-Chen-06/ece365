@@ -42,6 +42,10 @@ class hashTable {
   // false if the specified key is not in the hash table.
   bool remove(const std::string &key);
 
+  // Get private capacity member variable for debugging
+  // Returns capacity
+  int getCapacity();
+
  private:
 
   // Each item in the hash table contains:
