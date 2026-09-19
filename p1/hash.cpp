@@ -15,11 +15,29 @@ hashTable::hashTable(int size) {
 }
 
 // public functions
+int hashTable::insert(const std::string &key, void *pv = nullptr) {
+    
+}
+
 int hashTable::getCapacity() {
     return capacity;
 }
 
 // private implementation code
+
+// hash function
+int hashTable::hash(const std::string &key) {
+    // I chose djb2 hash algorithm because I thought the bit shifting 
+    // to multiply by 33 was cool. Implementation followed:
+    // http://www.cse.yorku.ca/~oz/hash.html
+    unsigned int hash = 5381;
+
+    for (unsigned char c : key) {
+        hash = ((hash << 5) + hash) + c;
+    }
+    return hash % capacity;
+
+}
 
 // Return a prime number at least as large as size.
 // Uses a precomputed sequence of selected prime numbers.
