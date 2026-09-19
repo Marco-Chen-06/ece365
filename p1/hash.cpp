@@ -16,6 +16,13 @@ hashTable::hashTable(int size) {
 
 // public functions
 int hashTable::insert(const std::string &key, void *pv) {
+    // 0.5 load factor
+    if (filled >= capacity / 2) {
+        if (!rehash()) {
+            return 2;
+        }
+    }
+
     hashItem item;
     item.key = key;
     item.isOccupied = true;
@@ -24,10 +31,7 @@ int hashTable::insert(const std::string &key, void *pv) {
     int hash_index = hash(key);
 
     while ((data[hash_index].isOccupied) || data[hash_index].isDeleted) {
-        if (filled >= capacity)  {
-            rehash();
-        }
-        hash_index = (hashindex + 1) % capacity;
+        hash_index = (hash_index + 1) % capacity;
     }
 
     data[hash_index] = item;
@@ -74,11 +78,6 @@ bool hashTable::remove(const std::string &key) {
     return true;
 }
 
-
-int hashTable::getCapacity() {
-    return capacity;
-}
-
 // private implementation code
 
 // hash function
@@ -119,7 +118,7 @@ bool hashTable::rehash() {
         if (data[i].isOccupied) {
             hash_index = hash(data[i].key);
             while (new_data[i].isOccupied) {
-                hash_index++;
+                hash_index = (hash_index + 1) % capacity;
             }
             new_data[hash_index] = data[i];
         }
