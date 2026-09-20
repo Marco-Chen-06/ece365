@@ -1,4 +1,5 @@
 #include "hash.h"
+#include <utility>
 
 // prime numbers taken from http://my.core.com/~katiemarie10/prime/prime.htm
 static const unsigned int primes[] = {
@@ -27,10 +28,13 @@ int hashTable::insert(const std::string &key, void *pv) {
     item.key = key;
     item.isOccupied = true;
     item.isDeleted = false;
-    item.pv = nullptr;
+    item.pv = pv;
     int hash_index = hash(key);
 
     while ((data[hash_index].isOccupied) || data[hash_index].isDeleted) {
+        if (data[hash_index].key == key) {
+            return 1;
+        }
         hash_index = (hash_index + 1) % capacity;
     }
 
@@ -58,7 +62,7 @@ void *hashTable::getPointer(const std::string &key, bool *b) {
     if (b) {
         *b = true;
     }
-    return &data[index];
+    return data[index].pv;
 }
 
 int hashTable::setPointer(const std::string &key, void *pv) {
@@ -66,10 +70,12 @@ int hashTable::setPointer(const std::string &key, void *pv) {
     if (index == -1) {
         return 1;
     }
-    pv = &data[index];
+    data[index].pv = pv;
     return 0;
 }
 bool hashTable::remove(const std::string &key) {
+    // as recomended in lecture, I chose not to decrement filled on deletion since 
+    // i am doing lazy deletion
     int index = findPos(key);
     if (index == -1) {
         return false;
@@ -85,44 +91,54 @@ int hashTable::hash(const std::string &key) {
     // I chose djb2 hash algorithm because I thought the bit shifting 
     // to multiply by 33 was cool. Implementation followed:
     // http://www.cse.yorku.ca/~oz/hash.html
-    unsigned int hash = 5381;
+    unsigned int hash_val = 5381;
 
     for (unsigned char c : key) {
-        hash = ((hash << 5) + hash) + c;
+        hash_val = ((hash_val << 5) + hash_val) + c;
     }
-    return hash % capacity;
+    return hash_val % capacity;
 
 }
 
 int hashTable::findPos(const std::string &key) {
-    for (int i = 0; i < data.size(); i++) {
-        if (data[i].key == key) {
-            return i;
+    int hash_index = hash(key);
+    while (data[hash_index].isOccupied || data[hash_index].isDeleted) {
+        if ((data[hash_index].key == key) && !data[hash_index].isDeleted){
+            return hash_index;
         }
+        hash_index = (hash_index + 1) % capacity;
     }
     return -1;
 }
 
 bool hashTable::rehash() {
     std::vector<hashItem> new_data;
-    capacity = getPrime(capacity * 2);
-    try {
-        new_data.resize(capacity); // Request a huge size
-    } catch (const std::bad_alloc& e) {
+    int new_capacity = getPrime(capacity * 2);
+    // if getPrime returns 0, that means no prime number was found
+    if (new_capacity == 0) {
         return false;
     }
-    new_data.resize(capacity);
+
+    try {
+        new_data.resize(new_capacity);
+    } catch (const std::bad_alloc&) {
+        return false;
+    }
+    capacity = new_capacity;
 
     int hash_index;
-    for (int i = 0; i < data.size(); i++) {
-        if (data[i].isOccupied) {
+    int new_filled = 0;
+    for (size_t i = 0; i < data.size(); i++) {
+        if (data[i].isOccupied && !data[i].isDeleted) {
             hash_index = hash(data[i].key);
-            while (new_data[i].isOccupied) {
+            while (new_data[hash_index].isOccupied) {
                 hash_index = (hash_index + 1) % capacity;
             }
             new_data[hash_index] = data[i];
+            new_filled++;
         }
     }
+    filled = new_filled;
     data = std::move(new_data);
     return true;
 }
@@ -130,9 +146,9 @@ bool hashTable::rehash() {
 // Return a prime number at least as large as size.
 // Uses a precomputed sequence of selected prime numbers.
 unsigned int hashTable::getPrime(int size) {
-    int primes_len = sizeof(primes) / sizeof(primes[0]);
-    for (int i = 0; i < primes_len; i++) {
-        if (size < primes[i]) {
+    size_t primes_len = sizeof(primes) / sizeof(primes[0]);
+    for (size_t i = 0; i < primes_len; i++) {
+        if (size <= primes[i]) {
             return primes[i];
         }
     }
