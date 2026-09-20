@@ -74,7 +74,7 @@ int hashTable::setPointer(const std::string &key, void *pv) {
     return 0;
 }
 bool hashTable::remove(const std::string &key) {
-    // as recomended in lecture, I chose not to decrement filled on deletion since 
+    // as recommended in lecture, I chose not to decrement filled on deletion since 
     // i am doing lazy deletion
     int index = findPos(key);
     if (index == -1) {
