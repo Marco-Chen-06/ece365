@@ -1,35 +1,85 @@
 #include "hash.h"
 #include <iostream>
 #include <fstream>
+#include <cctype>
+
+void print_formatted_output(const std::string &word, bool has_digit, bool long_word, int line_count, hashTable &dict, std::ofstream &out) {
+    if (word.empty()) {
+        return;
+    }
+    if (long_word) {
+        out << "Long word at line " << line_count << ", starts: " << word << '\n';
+        return;
+    }
+    if (has_digit) {
+        return;
+    }
+    if (!dict.contains(word)) {
+        out << "Unknown word at line " << line_count << ": " << word << '\n';
+    }
+}
 
 int main() {
     // small wordlist is around 25000 words 
-    std::ifstream file("wordlist_small.txt");
-    if (!file.is_open()) {
-        std::cerr << "Failed to open file\n";
-        return 1;
+    std::ifstream dict("wordlist_small.txt");
+    if (!dict.is_open()) {
+        std::cerr << "Failed to open dictionary\n";
+        return -1;
     }
+
+    std::ofstream out_file("outfile.txt");
 
     std::string word;
+    // assume avg dictionary contains 50k words
+    hashTable ht(50000);
 
-    // cause as much rehashing as possible
-    hashTable ht(0);
-
-    while (std::getline(file, word)) {
+    while (std::getline(dict, word)) {
+        for (size_t i = 0; i < word.length(); i++) {
+              word[i] = static_cast<char>(std::tolower(static_cast<unsigned char>(word[i])));
+        }
         ht.insert(word);
-        // std::cout << word << std::endl;
+    }
+    dict.close();
+
+    std::ifstream input_file("lyrics.txt");
+    if (!input_file.is_open()) {
+        std::cerr << "Failed to open input file\n";
     }
 
-    std::cout << "done inserting\n";
-
-    // traverse small wordlist again and check contains() for every key
-    file.clear();
-    file.seekg(0, std::ios::beg);
-    while (std::getline(file, word)) {
-        if (ht.contains(word) == false) {
-            std::cout << "error\n";
-            return -1;
+    std::string line;
+    int line_count = 1;
+    bool has_digit;
+    bool long_word;
+    char c;
+    while (std::getline(input_file, line)) {
+        has_digit = false;
+        long_word = false;
+        for (size_t i = 0; i < line.length(); i++) {
+            c = line[i];
+            if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || (c == '-') || (c == '\'')) {
+                // we haven't reached a separator yet
+                if (c >= '0' && c <= '9') {
+                    has_digit = true;
+                }
+                if (word.length() >= 20) {
+                    long_word = true;
+                } else {
+                    word += static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+                }
+            } else {
+                // we have reached a separator
+                print_formatted_output(word, has_digit, long_word, line_count, ht, out_file);
+                word = "";
+                has_digit = false;
+                long_word = false;
+            }
         }
+        // print accordingly if there is a number in the word or it's too long
+        print_formatted_output(word, has_digit, long_word, line_count, ht, out_file);
+        word = "";
+        has_digit = false;
+        long_word = false;
+        line_count++;
     }
 
     std::cout << "done checking contains, no issues\n";
