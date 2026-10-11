@@ -17,29 +17,38 @@ hashTable::hashTable(int size) {
 
 // public functions
 int hashTable::insert(const std::string &key, void *pv) {
-    // 0.5 load factor
+    // keep load factor at or below 0.5
     if (filled >= capacity / 2) {
         if (!rehash()) {
             return 2;
         }
     }
 
-    hashItem item;
-    item.key = key;
-    item.isOccupied = true;
-    item.isDeleted = false;
-    item.pv = pv;
     int hash_index = hash(key);
+    int first_deleted_item = -1;  
 
-    while ((data[hash_index].isOccupied) || data[hash_index].isDeleted) {
-        if (data[hash_index].key == key) {
+    while (data[hash_index].isOccupied) {
+        if (data[hash_index].isDeleted) {
+            if (first_deleted_item == -1) {
+                first_deleted_item = hash_index;
+            }
+        } else if (data[hash_index].key == key) {
             return 1;
         }
         hash_index = (hash_index + 1) % capacity;
     }
 
-    data[hash_index] = item;
-    filled++;
+    if (first_deleted_item != -1) {
+        // reuse the deleted item bc of good feedback from last assignment
+        hash_index = first_deleted_item;
+    } else {
+        filled++;
+    }
+
+    data[hash_index].key = key;
+    data[hash_index].isOccupied = true;
+    data[hash_index].isDeleted = false;
+    data[hash_index].pv = pv;
     return 0;
 }
 
@@ -102,8 +111,8 @@ int hashTable::hash(const std::string &key) {
 
 int hashTable::findPos(const std::string &key) {
     int hash_index = hash(key);
-    while (data[hash_index].isOccupied || data[hash_index].isDeleted) {
-        if ((data[hash_index].key == key) && !data[hash_index].isDeleted){
+    while (data[hash_index].isOccupied) {
+        if (!data[hash_index].isDeleted && data[hash_index].key == key) {
             return hash_index;
         }
         hash_index = (hash_index + 1) % capacity;
