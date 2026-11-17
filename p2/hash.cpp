@@ -39,7 +39,7 @@ int hashTable::insert(const std::string &key, void *pv) {
     }
 
     if (first_deleted_item != -1) {
-        // reuse the deleted item bc of good feedback from last assignment
+        // reuse first deleted slot found
         hash_index = first_deleted_item;
     } else {
         filled++;
