@@ -17,10 +17,11 @@ class graph {
         // return true if a vertex with id exists
         bool contains(const std::string &id);
 
-        // dijkstra as a private function in the graph class, as said during lecture
+        // run dijkstra starting from start vertex
         void dijkstra(const std::string&start);
 
-        // function from midterm to display results
+        // write vertex distance and path in the format the pset asks for (into the output file)
+        // returns false if file fails to open
         bool displayPath(const std::string&filename);
 
     private:

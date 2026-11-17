@@ -10,7 +10,7 @@ heap.o: heap.cpp heap.h
 hash.o: hash.cpp hash.h
 	g++ -c hash.cpp
 
-graph.o: graph.cpp graph.h
+graph.o: graph.cpp graph.h heap.h hash.h
 	g++ -c graph.cpp
 
 debug:
