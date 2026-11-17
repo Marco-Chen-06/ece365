@@ -1,6 +1,8 @@
 #include "graph.h"
+#include "heap.h"
 #include <fstream>
 #include <iostream>
+#include <limits>
 
 graph::graph() : mapping(1000) {}
 
@@ -44,4 +46,20 @@ bool graph::contains(const std::string &id) {
         return true;
     }
     return false;
+}
+
+void graph::dijkstra(const std::string &start) {
+    // get maximum int value in a type safety way
+    // Source: https://stackoverflow.com/questions/1855459/maximum-value-of-int
+    int max_int = std::numeric_limits<int>::max();
+
+    // initialize all vertexes with distances to infinity
+    for (vertex &v : lookup) {
+        v.dist = max_int;
+        v.known = false;
+        v.prev = nullptr;
+    }
+
+    heap bin_heap(lookup.size());
+
 }
