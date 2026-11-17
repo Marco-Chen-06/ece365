@@ -3,6 +3,8 @@
 
 #include <string>
 #include <list>
+#include <vector>
+#include <ostream>
 #include "hash.h"
 
 class graph {
@@ -16,10 +18,10 @@ class graph {
         bool contains(const std::string &id);
 
         // dijkstra as a private function in the graph class, as said during lecture
-        void dijkstra(const std::string&);
+        void dijkstra(const std::string&start);
 
         // function from midterm to display results
-        bool displayPath(const std::string&);
+        bool displayPath(const std::string&filename);
 
     private:
         class vertex;
@@ -41,6 +43,8 @@ class graph {
         hashTable mapping;
 
         vertex *findVertex(const std::string &id);
+
+        void displayPathHelper(std::ostraem &out, vertex *v);
 };
 
 #endif

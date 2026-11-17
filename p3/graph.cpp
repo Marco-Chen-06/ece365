@@ -23,6 +23,7 @@ bool graph::load(const std::string &filename) {
     
     if (!file.is_open()) {
         std::cerr << "Error: File" << filename << "failed to open \n";
+        return false;
     }
 
     std::string src, dest;
@@ -36,4 +37,11 @@ bool graph::load(const std::string &filename) {
         pSrc->edges.push_back(tempEdge);
     }
     return true;
+}
+
+bool graph::contains(const std::string &id) {
+    if (mapping.contains(id)) {
+        return true;
+    }
+    return false;
 }
