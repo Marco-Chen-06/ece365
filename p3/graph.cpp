@@ -118,7 +118,25 @@ bool graph::displayPath(const std::string &filename) {
 
 // this function is essentially what I wrote for the iterative
 // solution on the midterm
-void graph::displayPathHelper(std::ostream &out, vertex *v) {
-    std::stack<vertex * path;
+void graph::displayPathHelper(std::ostream &out, vertex *t) {
+    std::stack<vertex *> path;
+    vertex *v = t;
+    path.push(v);
+    while (v->prev != nullptr) {
+        path.push(v->prev);
+        v = v->prev;
+    }
+
+    // display everything
+    bool first = true;
+    while (!path.empty()) {
+        vertex *temp = path.top();
+        path.pop();
+        if (!first) {
+            out << ", ";
+        }
+        out << temp->id;
+        first = false;
+    }
 
 }
