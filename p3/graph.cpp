@@ -70,7 +70,7 @@ void graph::dijkstra(const std::string &start) {
         bin_heap.insert(v.id, v.dist, &v);
     }
 
-    vertex *cur_vetex;
+    vertex *cur_vertex;
     while (bin_heap.deleteMin(nullptr, nullptr, &cur_vertex) == 0) {
         if (cur_vertex->dist == max_int) {
             break;
@@ -79,7 +79,7 @@ void graph::dijkstra(const std::string &start) {
     }
 
     for (edge &e : cur_vertex->edges) {
-        vertex *neighbor  e.dest;
+        vertex *neighbor = e.dest;
         if (neighbor->known) {
             continue;
         }
