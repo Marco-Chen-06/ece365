@@ -2,7 +2,7 @@
 #define _GRAPH_H
 
 #include <string>
-#include <vector>
+#include <list>
 #include "hash.h"
 
 class graph {
@@ -37,7 +37,7 @@ class graph {
                 vertex *prev;
         };
 
-        std::vector<vertex*> lookup;
+        std::list<vertex> lookup;
         hashTable mapping;
 
         vertex *findVertex(const std::string &id);

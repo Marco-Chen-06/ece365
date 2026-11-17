@@ -1,4 +1,6 @@
 #include "graph.h"
+#include <fstream>
+#include <iostream>
 
 graph::graph() : mapping(1000) {}
 
@@ -9,9 +11,29 @@ graph::vertex *graph::findVertex(const std::string &id) {
         return pv;
     }
     vertex v;
-    lookup.push_back(&v);
-    pv = lookup.back();
+    lookup.push_back(v);
+    pv = &lookup.back();
     pv->id = id;
-    lookup.insert(id, pv);
+    mapping.insert(id, pv);
     return pv;
+}
+
+bool graph::load(const std::string &filename) {
+    std::ifstream file(filename);
+    
+    if (!file.is_open()) {
+        std::cerr << "Error: File" << filename << "failed to open \n";
+    }
+
+    std::string src, dest;
+    int cost;
+    while (file >> src >> dest >> cost) {
+        vertex *pSrc = findVertex(src);
+        vertex *pDest = findVertex(dest);
+        edge tempEdge;
+        tempEdge.dest = pDest;
+        tempEdge.cost = cost;
+        pSrc->edges.push_back(tempEdge);
+    }
+    return true;
 }
