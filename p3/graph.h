@@ -44,7 +44,7 @@ class graph {
 
         vertex *findVertex(const std::string &id);
 
-        void displayPathHelper(std::ostraem &out, vertex *v);
+        void displayPathHelper(std::ostream &out, vertex *v);
 };
 
 #endif

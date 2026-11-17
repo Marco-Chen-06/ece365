@@ -3,6 +3,7 @@
 #include <fstream>
 #include <iostream>
 #include <limits>
+#include <stack>
 
 graph::graph() : mapping(1000) {}
 
@@ -60,6 +61,64 @@ void graph::dijkstra(const std::string &start) {
         v.prev = nullptr;
     }
 
+    // starting vertex is 0 distance
+    vertex *start_vertex = static_cast<vertex *>(mapping.getPointer(start));
+    start_vertex->dist = 0;
+
     heap bin_heap(lookup.size());
+    for (vertex &v : lookup) {
+        bin_heap.insert(v.id, v.dist, &v);
+    }
+
+    vertex *cur_vetex;
+    while (bin_heap.deleteMin(nullptr, nullptr, &cur_vertex) == 0) {
+        if (cur_vertex->dist == max_int) {
+            break;
+        }
+        cur_vertex->known = true;
+    }
+
+    for (edge &e : cur_vertex->edges) {
+        vertex *neighbor  e.dest;
+        if (neighbor->known) {
+            continue;
+        }
+        int new_dist = cur_vertex->dist + e.cost;
+        if (new_dist < neighbor->dist) {
+            neighbor->dist = new_dist;
+            neighbor->prev = cur_vertex;
+            // heap decreaseKey
+            bin_heap.setKey(neighbor->id, new_dist);
+        }
+    }
+}
+
+// given the output file, display the path
+bool graph::displayPath(const std::string &filename) {
+    std::ofstream file(filename);
+    if (!file.is_open()) {
+        std::cerr << "Error: file " << filename << " fialted to open\n";
+        return false;
+    }
+
+    int max_int = std::numeric_limits<int>::max();
+
+    for (vertex &v : lookup) {
+        file << v.id << ": ";
+        if (v.dist == max_int) {
+            file << "NO PATH\n";
+            continue;
+        }
+        file << v.dist << " [";
+        displayPathHelper(file, &v);
+        file << "]\n";
+    }
+    return true;
+}
+
+// this function is essentially what I wrote for the iterative
+// solution on the midterm
+void graph::displayPathHelper(std::ostream &out, vertex *v) {
+    std::stack<vertex * path;
 
 }
