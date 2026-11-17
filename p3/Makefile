@@ -1,8 +1,8 @@
-useHeap.exe: useHeap.o heap.o hash.o
-	g++ -o useHeap.exe useHeap.o heap.o hash.o
+dijkstra.exe: dijkstra.o heap.o hash.o
+	g++ -o dijkstra.exe dijkstra.o heap.o hash.o
 
-useHeap.o: useHeap.cpp
-	g++ -c useHeap.cpp
+dijkstra.o: dijkstra.cpp
+	g++ -c dijkstra.cpp
 
 heap.o: heap.cpp heap.h
 	g++ -c heap.cpp
@@ -11,7 +11,7 @@ hash.o: hash.cpp hash.h
 	g++ -c hash.cpp
 
 debug:
-	g++ -g -o useHeapDebug.exe useHeap.cpp heap.cpp hash.cpp
+	g++ -g -o dijkstraDebug.exe dijkstra.cpp heap.cpp hash.cpp
 
 clean:
 	rm -f *.exe *.o *.stackdump *~
