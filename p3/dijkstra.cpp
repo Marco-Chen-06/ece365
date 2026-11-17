@@ -19,13 +19,13 @@ int main()
   cout << "Enter name of graph file: ";
   getline(cin, filename);
   if (!g.load(filename)) {
-    cerr << "Erorr: could not open " << filename << "\n";
     return -1;
   }
 
   string start_vertex;
-  cout <<"Enter name of starting vertex: ";
   do {
+    // user re-prompted until they enter a valid vertex
+    cout <<"Enter name of starting vertex: ";
     getline(cin, start_vertex);
   } while (!g.contains(start_vertex));
 
@@ -38,7 +38,6 @@ int main()
   cout << "Enter name of output file: ";
   getline(cin, filename);
   if (!g.displayPath(filename)) {
-    cerr << "Error: could not open " << filename << "\n";
     return -2;
   }
   return 0;

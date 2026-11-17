@@ -25,7 +25,7 @@ bool graph::load(const std::string &filename) {
     std::ifstream file(filename);
     
     if (!file.is_open()) {
-        std::cerr << "Error: File" << filename << "failed to open \n";
+        std::cerr << "Error: file " << filename << " failed to open\n";
         return false;
     }
 
@@ -76,19 +76,19 @@ void graph::dijkstra(const std::string &start) {
             break;
         }
         cur_vertex->known = true;
-    }
 
-    for (edge &e : cur_vertex->edges) {
-        vertex *neighbor = e.dest;
-        if (neighbor->known) {
-            continue;
-        }
-        int new_dist = cur_vertex->dist + e.cost;
-        if (new_dist < neighbor->dist) {
-            neighbor->dist = new_dist;
-            neighbor->prev = cur_vertex;
-            // heap decreaseKey
-            bin_heap.setKey(neighbor->id, new_dist);
+        for (edge &e : cur_vertex->edges) {
+            vertex *neighbor = e.dest;
+            if (neighbor->known) {
+                continue;
+            }
+            int new_dist = cur_vertex->dist + e.cost;
+            if (new_dist < neighbor->dist) {
+                neighbor->dist = new_dist;
+                neighbor->prev = cur_vertex;
+                // heap decreaseKey
+                bin_heap.setKey(neighbor->id, new_dist);
+            }
         }
     }
 }
